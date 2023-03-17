@@ -5,11 +5,100 @@ from flask_login import login_user, logout_user, login_required
 from flask_cors import cross_origin
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask import Flask, jsonify
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import GetAssetsRequest
+import alpaca_trade_api as tradeapi
+
+trading_client = TradingClient('PKBL4DREIY800L0SL7J4', 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw')
+
+# Get our account information.
+account = trading_client.get_account()
+
+# Check if our account is restricted from trading.
+if account.trading_blocked:
+    print('Account is currently restricted from trading.')
+
+# Check how much money we can use to open new positions.
+print('${} is available as buying power.'.format(account.buying_power))
+
+# Get our account information.
+account = trading_client.get_account()
+
+# Check our current balance vs. our balance at the last market close
+balance_change = float(account.equity) - float(account.last_equity)
+print(f'Today\'s portfolio balance change: ${balance_change}')
+
+# search for US equities
+search_params = GetAssetsRequest(asset_class=AssetClass.US_EQUITY)
+
+assets = trading_client.get_all_assets(search_params)
+
+# search for AAPL
+aapl_asset = trading_client.get_asset('AAPL')
+
+if aapl_asset.tradable:
+    print('We can trade AAPL.')
+
+# preparing market order
+market_order_data = MarketOrderRequest(
+                    symbol="SPY",
+                    qty=0.023,
+                    side=OrderSide.BUY,
+                    time_in_force=TimeInForce.DAY
+                    )
+
+# Market order
+market_order = trading_client.submit_order(
+                order_data=market_order_data
+               )
+
+# preparing limit order
+limit_order_data = LimitOrderRequest(
+                    symbol="BTC/USD",
+                    limit_price=17000,
+                    notional=4000,
+                    side=OrderSide.SELL,
+                    time_in_force=TimeInForce.FOK
+                   )
+
+# Limit order
+limit_order = trading_client.submit_order(
+                order_data=limit_order_data
+              )
+
+api = tradeapi.REST()
+# Get our position in AAPL.
+aapl_position = api.get_position('AAPL')
+
+# Get a list of all of our positions.
+portfolio = api.list_positions()
+
+# Print the quantity of shares for each position.
+for position in portfolio:
+    print("{} shares of {}".format(position.qty, position.symbol))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from trade_api import get_account_data
 # import alpaca_trade_api as api
 # import alpaca_trade_api as tradeapi
-import random
+# import random
 # from flask_sockets import Sockets
-import json
+# import json
 # import websocket
 # from geventwebsocket.handler import WebSocketHandler
 # from gevent.pywsgi import WSGIServer
@@ -20,23 +109,21 @@ import json
 
 auth = Blueprint('auth', __name__, template_folder='auth_templates')
 
+# @app.route('/api/get_account_data')
+# def get_account():
+#     data = get_account_data()
+#     return jsonify(data)
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 
-# app = Flask(__name__)
-# setup_cors(app)
-
-def get_latest_news():
-    headers = {
-        'Apca-Api-Key-Id': '<PKBL4DREIY800L0SL7J4>',
-        'Apca-Api-Secret-Key': '<Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw>'
-    }
-    url = 'https://data.alpaca.markets/v1beta1/news'
-    response = requests.get(url, headers=headers)
-    return jsonify(response.json())
 
 
-@auth.route('/signup', methods=["GET", "POST"])
+
+
+@auth.route('/api/signup', methods=["GET", "POST"])
 def signUpPage():
     data=request.json
     print(request.method)
@@ -64,7 +151,7 @@ basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
 
 
-@auth.route('/login', methods=["POST"])
+@auth.route('/api/login', methods=["POST"])
 @basic_auth.login_required
 # Login Function
 def getToken():
