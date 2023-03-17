@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, jsonify
-from models import User
+from models import User,Transaction,Order,Trade,Position
 # from .forms import UserCreationForm, LoginForm
 from flask_login import login_user, logout_user, login_required
 from flask_cors import cross_origin
@@ -12,6 +12,7 @@ from alpaca.trading.enums import AssetClass
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 import alpaca_trade_api as tradeapi
+import datetime
 # from alpaca.data import StockDataStream
 # import asyncio
 # from alpaca.data import StockDataStream
@@ -154,15 +155,27 @@ auth = Blueprint('auth', __name__, template_folder='auth_templates')
 @auth.route('/api/buystock', methods= ["POST"])
 @basic_auth.login_required
 def buystock():
+    user = basic_auth.current_user()
+    data=request.json
+
+    # access items from data as data[some_key]
+
     ## save request to data base
     # buy stock
     ## if successful, then add the order id the reques
     
-    data=request.json
+    ## make transaction and save
     print((request))
-    user = basic_auth.current_user()
     stock_ticker=data['symbol']
     amount=data['quantity']
+
+    transaction = Transaction(user.id, "stock_purchase",amount,datetime.datetime.utcnow() )
+    transaction.saveToDB()
+    ## make buy stock with transaction_id
+    ## save stock purchase
+
+   
+  
     # preparing market order
     market_order_data = MarketOrderRequest(
                     symbol=stock_ticker,
@@ -176,18 +189,47 @@ def buystock():
                 order_data=market_order_data
                )
     print(market_order)
-    return jsonify({
-        'id': market_order.id,
-        'symbol': market_order.symbol,
-        'qty': market_order.qty,
-        'side': market_order.side,
-        'type': market_order.type,
-        'status': market_order.status,
-        'created_at': market_order.created_at,
-        'submitted_at': market_order.submitted_at,
-    })
+
+    db_order = Order(user.id,market_order.symbol,market_order.type,market_order.qty,market_order.status,market_order.id,transaction.id )
+
+    db_order.saveToDB()
+
+    return jsonify(db_order.to_dict())
+    # return jsonify({
+    #     'id': db_order.id,
+    #     'transaction_id': db_order.transaction_id,
+    #     'order_id': market_order.id,
+    #     'symbol': market_order.symbol,
+    #     'qty': market_order.qty,
+    #     'side': market_order.side,
+    #     'type': market_order.type,
+    #     'status': market_order.status,
+    #     'created_at': market_order.created_at,
+    #     'submitted_at': market_order.submitted_at,
+    # })
                
 
+
+# Define a helper function to query the database
+def get_order(order_id):
+    return Order.query.get(order_id)
+
+# Define a Flask route to get all orders
+@auth.route('/api/orders', methods= ["GET"])
+@basic_auth.login_required
+def get_orders():
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
+# Define a Flask route to get a specific order
+@auth.route('/orders/<int:order_id>', methods=['GET'])
+@basic_auth.login_required
+def get_order_detail(order_id):
+    order = get_order(order_id)
+    if order:
+        return jsonify(order.to_dict())
+    else:
+        return jsonify({'error': 'Order not found'}), 404
 
 
 @auth.route('/api/signup', methods=["GET", "POST"])
@@ -261,7 +303,8 @@ def verifyToken(token):
 # alpaca = api.REST(API_KEY, API_SECRET, BASE_URL)
 
 # # Define a Flask route to retrieve account information
-# @app.route('/account')
+# @auth.route('/account')
+# @basic_auth.login_required
 # def get_account_info():
 #     account_info = trading_client.get_account()
 #     return jsonify(account_info)
