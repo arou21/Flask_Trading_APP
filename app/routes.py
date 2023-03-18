@@ -16,6 +16,7 @@ import datetime
 # from alpaca.data import StockDataStream
 # import asyncio
 # from alpaca.data import StockDataStream
+# api = tradeapi.REST()
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
@@ -135,22 +136,27 @@ auth = Blueprint('auth', __name__, template_folder='auth_templates')
 # if __name__ == '__main__':
 #     app.run(debug=True)
 
-# @auth.route('/api/news', methods=["GET"])
-# def get_news():
-#     url = 'https://data.alpaca.markets/v1beta1/news?exclude_contentless=true'
-#     headers = {
-#         'Apca-Api-Key-Id': 'PKBL4DREIY800L0SL7J4',
-#         'Apca-Api-Secret-Key': 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw>',
-#     }
+@auth.route('/api/news', methods=["GET"])
+def get_news():
+    url = 'https://data.alpaca.markets/v1beta1/news?exclude_contentless=true'
+    headers = {
+        'Apca-Api-Key-Id': 'PKBL4DREIY800L0SL7J4',
+        'Apca-Api-Secret-Key': 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw',
+    }
 
-#     response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers)
 
-#     if response.status_code == 200:
-#         response_data = response.json()
-#         return jsonify(response_data)
-#     else:
-#         return 'Error: ' + str(response.status_code), response.status_code
+    if response.status_code == 200:
+        response_data = response.json()
+        return jsonify(response_data)
+    else:
+        return 'Error: ' + str(response.status_code), response.status_code
 
+def toDictionary(obj):
+    result = {}
+    for key, value in obj:
+        result[key] =value
+    return result
 
 @auth.route('/api/buystock', methods= ["POST"])
 @basic_auth.login_required
@@ -287,24 +293,70 @@ def verifyToken(token):
         return user
 
 
-
-
-
-
-
-
-# Initialize the Flask app
-# app = Flask(__name__)
-
-# # Configure Alpaca API credentials
-# API_KEY = "<PKBL4DREIY800L0SL7J4>"
-# API_SECRET = "<Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw>"
-# BASE_URL = "https://paper-api.alpaca.markets"
-# alpaca = api.REST(API_KEY, API_SECRET, BASE_URL)
-
 # # Define a Flask route to retrieve account information
-# @auth.route('/account')
+@auth.route('/account')
+@basic_auth.login_required
+def get_account_info():
+    account_info = trading_client.get_account()
+    return jsonify({
+        'id': account_info.id ,#:  # The unique identifier for the account.
+'account_number': account_info.account_number ,#:  # The account number associated with the account.
+'status': account_info.status ,#:  # The current status of the account, either "ACTIVE" or "SUSPENDED".
+'currency': account_info.currency ,#:  # The base currency used for the account.
+'buying_power': account_info.buying_power ,#:  # The amount of buying power available for the account.
+'cash': account_info.cash ,#:  # The amount of cash available for the account.
+'portfolio_value': account_info.portfolio_value ,#:  # The total value of all assets in the account, including cash.
+'pattern_day_trader': account_info.pattern_day_trader ,#:  # A boolean indicating whether the account is classified as a pattern day trader.
+'trading_blocked': account_info.trading_blocked ,#:  # A boolean indicating whether trading is currently blocked for the account.
+'transfers_blocked': account_info.transfers_blocked ,#:  # A boolean indicating whether transfers are currently blocked for the account.
+'account_blocked': account_info.account_blocked ,#:  # A boolean indicating whether the account is currently blocked for any reason.
+'created_at': account_info.created_at ,#:  # The date and time when the account was created.
+    })
+
+    
+
+def positionToDict(position):
+    
+    return {
+        "asset_id":position.asset_id,
+"symbol":position.symbol,
+"exchange":position.exchange,
+"asset_class":position.asset_class,
+"avg_entry_price":position.avg_entry_price,
+"qty":position.qty,
+"side":position.side,
+"market_value":position.market_value,
+"cost_basis":position.cost_basis,
+"unrealized_pl":position.unrealized_pl,
+"unrealized_plpc":position.unrealized_plpc,
+"unrealized_intraday_pl":position.unrealized_intraday_pl,
+"unrealized_intraday_plpc":position.unrealized_intraday_plpc,
+"current_price":position.current_price,
+"lastday_price":position.lastday_price,
+"change_today":position.change_today,
+    }
+    
+    
+# # Define a Flask route to retrieve account information
+@auth.route('/positions')
+@basic_auth.login_required
+def getPositions():
+    position_info = trading_client.get_all_positions()
+    positions = [positionToDict(position) for position in position_info]
+    return jsonify(positions)
+    
+# # Define a Flask route to retrieve account information
+# @auth.route('/sell-position/<int:qty>/<')
 # @basic_auth.login_required
-# def get_account_info():
-#     account_info = trading_client.get_account()
-#     return jsonify(account_info)
+# def sellPosition():
+#     order = trading_client.submit_order(
+#                 symbol=symbol,
+#                 qty=qty,
+#                 side=side,
+#                 type='limit',
+#                 time_in_force='gtc',
+#                 limit_price=limit_price
+#             )
+#     # position_info = trading_client.get_all_positions()
+#     # positions = [positionToDict(position) for position in position_info]
+#     return jsonify("position sold")
