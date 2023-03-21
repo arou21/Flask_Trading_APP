@@ -6,10 +6,7 @@ class Config():
     FLASK_ENV = os.environ.get('FLASK_ENV')
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    # SQLALCHEMY_BINDS = {
-    #     'users': 'postgres://ufjrrcat:nmh9ZdOuwQcDmrdcTDwdUsx-Xf-6cTIb@batyr.db.elephantsql.com/ufjrrcat',
-    #     'posts': 'postgres://ufjrrcat:nmh9ZdOuwQcDmrdcTDwdUsx-Xf-6cTIb@batyr.db.elephantsql.com/ufjrrcat'
-    # }
+   
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

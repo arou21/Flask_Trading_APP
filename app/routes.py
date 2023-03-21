@@ -105,52 +105,7 @@ print('${} is available as buying power.'.format(account.buying_power))
 
 auth = Blueprint('auth', __name__, template_folder='auth_templates')
 
-# app = Flask(__name__)
 
-# # initialize an empty list to store incoming stock data
-# stock_data = []
-
-# # define a callback function to handle incoming data
-# def handle_data(data):
-#     stock_data.append(data)
-
-# api_key = 'PKBL4DREIY800L0SL7J4'
-# secret_key = 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw'
-
-# # create a stream object with your API keys
-# stream = StockDataStream(api_key, secret_key)
-
-# # define a callback function to handle incoming data
-# def handle_data(data):
-#     print(data)
-
-# # subscribe to real-time data for a specific stock
-# symbol = 'AAPL'
-# stream.subscribe(symbol, handle_data)
-# stream.connect()
-# @app.route('/api/stock_data', methods=['GET'])
-# def get_stock_data():
-#     # return the stock data as a JSON object
-#     return jsonify({'data': stock_data})
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-# @auth.route('/api/news', methods=["GET"])
-# def get_news():
-#     url = 'https://data.alpaca.markets/v1beta1/news'
-#     headers = {
-#         'Apca-Api-Key-Id': 'PKBL4DREIY800L0SL7J4',
-#         'Apca-Api-Secret-Key': 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw',
-#     }
-
-#     response = requests.get(url, headers=headers)
-
-#     if response.status_code == 200:
-#         response_data = response.json()
-#         return jsonify(response_data)
-#     else:
-#         return 'Error: ' + str(response.status_code), response.status_code
 
 @auth.route('/api/news', methods=["GET"])
 def get_news():
@@ -362,17 +317,38 @@ def getPositions():
     return jsonify(positions)
     
 # # Define a Flask route to retrieve account information
-# @auth.route('/sell-position/<int:qty>/<')
+
+
+@auth.route('/sell-position', methods=['GET', 'POST'])
+@basic_auth.login_required
+def sell_position():
+    if request.method == 'POST':
+        # process the sell position request
+        symbol = request.form.get('symbol')
+        qty = request.form.get('qty')
+        order = trading_client.submit_order(
+            symbol=symbol,
+            qty=qty,
+            side='sell',
+            type='limit',
+            time_in_force='gtc',
+            
+        )
+        return jsonify("position sold")
+    else:
+        # handle GET requests (if needed)
+        return "This endpoint only accepts POST requests for selling positions."
+
+
+# @auth.route('/sell-position/<symbol>/<qty>')
 # @basic_auth.login_required
-# def sellPosition():
+# def sell_position(symbol, qty):
 #     order = trading_client.submit_order(
-#                 symbol=symbol,
-#                 qty=qty,
-#                 side=side,
-#                 type='limit',
-#                 time_in_force='gtc',
-#                 limit_price=limit_price
-#             )
-#     # position_info = trading_client.get_all_positions()
-#     # positions = [positionToDict(position) for position in position_info]
+#         symbol=symbol,
+#         qty=qty,
+#         side='sell',
+#         type='limit',
+#         time_in_force='gtc',
+#         limit_price=0.01  # replace with your desired limit price
+#     )
 #     return jsonify("position sold")
