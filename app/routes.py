@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user, login_required
 from flask_cors import cross_origin
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask import Flask, jsonify
-
+import requests
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import GetAssetsRequest
 from alpaca.trading.enums import AssetClass
@@ -136,6 +136,22 @@ auth = Blueprint('auth', __name__, template_folder='auth_templates')
 # if __name__ == '__main__':
 #     app.run(debug=True)
 
+# @auth.route('/api/news', methods=["GET"])
+# def get_news():
+#     url = 'https://data.alpaca.markets/v1beta1/news'
+#     headers = {
+#         'Apca-Api-Key-Id': 'PKBL4DREIY800L0SL7J4',
+#         'Apca-Api-Secret-Key': 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw',
+#     }
+
+#     response = requests.get(url, headers=headers)
+
+#     if response.status_code == 200:
+#         response_data = response.json()
+#         return jsonify(response_data)
+#     else:
+#         return 'Error: ' + str(response.status_code), response.status_code
+
 @auth.route('/api/news', methods=["GET"])
 def get_news():
     url = 'https://data.alpaca.markets/v1beta1/news?exclude_contentless=true'
@@ -152,11 +168,11 @@ def get_news():
     else:
         return 'Error: ' + str(response.status_code), response.status_code
 
-def toDictionary(obj):
-    result = {}
-    for key, value in obj:
-        result[key] =value
-    return result
+# def toDictionary(obj):
+#     result = {}
+#     for key, value in obj:
+#         result[key] =value
+#     return result
 
 @auth.route('/api/buystock', methods= ["POST"])
 @basic_auth.login_required
