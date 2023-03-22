@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_cors import CORS
 from app.routes import auth
+# from app.watchlist import watchlist_bp
 # import asynco 
 # from alpaca.data import StockDataStream
 # from app.api.routes import trade
@@ -38,7 +39,7 @@ def get_stock_data():
     return {'data': stock_data}
 
 app.register_blueprint(auth)
-
+# app.register_blueprint(watchlist_bp)
 
 
 

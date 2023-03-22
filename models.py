@@ -82,7 +82,7 @@ class Order(db.Model):
     quantity = db.Column(db.Integer)
     status = db.Column(db.String(255))
     market_order_id = db.Column(db.String(255))
-    external_id = db.Column(db.String(50))
+    # external_id = db.Column(db.String(50))
     transaction_id = db.Column(db.Integer,db.ForeignKey('transaction.id'))
     # Add any other relevant fields for the order table
     

@@ -13,6 +13,7 @@ from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 import alpaca_trade_api as tradeapi
 import datetime
+
 # from alpaca.data import StockDataStream
 # import asyncio
 # from alpaca.data import StockDataStream
@@ -34,72 +35,6 @@ if account.trading_blocked:
 
 # Check how much money we can use to open new positions.
 print('${} is available as buying power.'.format(account.buying_power))
-
-
-# # Check our current balance vs. our balance at the last market close
-# balance_change = float(account.equity) - float(account.last_equity)
-# print(f'Today\'s portfolio balance change: ${balance_change}')
-
-# # search for US equities
-# search_params = GetAssetsRequest(asset_class=AssetClass.US_EQUITY)
-
-# assets = trading_client.get_all_assets(search_params)
-
-# # search for AAPL
-# aapl_asset = trading_client.get_asset('AAPL')
-
-# if aapl_asset.tradable:
-#     print('We can trade AAPL.')
-
-# # preparing market order
-# market_order_data = MarketOrderRequest(
-#                     symbol="SPY",
-#                     qty=0.023,
-#                     side=OrderSide.BUY,
-#                     time_in_force=TimeInForce.DAY
-#                     )
-
-# Market order
-# market_order = trading_client.submit_order(
-#                 order_data=market_order_data
-#                )
-
-# # preparing limit order
-# limit_order_data = LimitOrderRequest(
-#                     symbol="BTC/USD",
-#                     limit_price=17000,
-#                     notional=4000,
-#                     side=OrderSide.SELL,
-#                     time_in_force=TimeInForce.FOK
-#                    )
-
-# # Limit order
-# limit_order = trading_client.submit_order(
-#                 order_data=limit_order_data
-#               )
-
-# api = tradeapi.REST()
-# # Get our position in AAPL.
-# aapl_position = api.get_position('AAPL')
-
-# # Get a list of all of our positions.
-# portfolio = api.list_positions()
-
-# # Print the quantity of shares for each position.
-# for position in portfolio:
-#     print("{} shares of {}".format(position.qty, position.symbol))
-
-
-# import alpaca_trade_api as api
-# import alpaca_trade_api as tradeapi
-# import random
-# from flask_sockets import Sockets
-# import json
-# import websocket
-# from geventwebsocket.handler import WebSocketHandler
-# from gevent.pywsgi import WSGIServer
-# from flask_cors import CORS
-# from cors import setup_cors
 
 
 
@@ -317,8 +252,6 @@ def getPositions():
     return jsonify(positions)
     
 # # Define a Flask route to retrieve account information
-
-
 @auth.route('/sell-position', methods=['GET', 'POST'])
 @basic_auth.login_required
 def sell_position():
@@ -340,15 +273,96 @@ def sell_position():
         return "This endpoint only accepts POST requests for selling positions."
 
 
-# @auth.route('/sell-position/<symbol>/<qty>')
-# @basic_auth.login_required
-# def sell_position(symbol, qty):
-#     order = trading_client.submit_order(
-#         symbol=symbol,
-#         qty=qty,
-#         side='sell',
-#         type='limit',
-#         time_in_force='gtc',
-#         limit_price=0.01  # replace with your desired limit price
-#     )
-#     return jsonify("position sold")
+
+
+from flask import Blueprint, jsonify, request
+import alpaca_trade_api as tradeapi
+
+# initialize Alpaca API
+api = tradeapi.REST()
+
+# create a Blueprint for watchlists
+# watchlist_bp = Blueprint('watchlist', __name__)
+
+# # create a watchlist
+# @auth.route('/api/watchlist', methods=['POST'])
+# def create_watchlist():
+#     name = request.json.get('name')
+#     symbols = request.json.get('symbols')
+
+#     # create the watchlist
+#     watchlist = api.create_watchlist(name=name, symbols=symbols)
+
+#     return jsonify(watchlist)
+
+# # get all watchlists
+# @auth.route('/api/watchlist', methods=['GET'])
+# def get_watchlists():
+#     watchlists = api.get_watchlists()
+
+#     return jsonify(watchlists)
+
+# # get a specific watchlist by ID
+# @auth.route('/api/watchlist/<string:watchlist_id>', methods=['GET'])
+# def get_watchlist(watchlist_id):
+#     watchlist = api.get_watchlist(watchlist_id=watchlist_id)
+
+#     return jsonify(watchlist)
+
+# # delete a specific watchlist by ID
+# @auth.route('/api/watchlist/<string:watchlist_id>', methods=['DELETE'])
+# def delete_watchlist(watchlist_id):
+#     api.delete_watchlist(watchlist_id=watchlist_id)
+
+#     return jsonify({'message': 'Watchlist deleted'})
+
+# @auth.route('/api/stocks/search', methods=['GET'])
+# def search_stocks():
+#     query = request.args.get('query')
+#     search_results = api.search_stocks(query)
+#     return jsonify(search_results)
+
+# @auth.route('/stock-quotes/<symbol>')
+# def stock_quotes(symbol):
+#     endpoint = f'https://data.alpaca.markets/v2/stocks/{symbol}/last_quote'
+#     # headers = {'APCA-API-KEY-ID': ALPACA_API_KEY, 'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY}
+#     # response = requests.get(endpoint, headers=headers)
+#     quote = response.json()['last']
+#     return jsonify({
+#         'symbol': symbol,
+#         'ask_price': quote['askprice'],
+#         'bid_price': quote['bidprice'],
+#         'last_trade_price': quote['lastprice'],
+#     })
+
+
+
+
+
+#need to be delated because of error not selling
+
+
+
+# @auth.route('/sell-position', methods=['POST'])
+# def sell_position():
+#     # Get symbol and quantity from request body
+#     symbol = request.json['symbol']
+#     qty = request.json['qty']
+
+#     # Construct request headers and payload
+#     # headers = {
+#     #     'APCA-API-KEY-ID': ALPACA_API_KEY,
+#     #     'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY
+#     # }
+#     data = {
+#         'symbol': symbol,
+#         'qty': qty,
+#         'type': 'market',
+#         'time_in_force': 'gtc'
+#     }
+
+#     # Make API request to sell position
+#     response = requests.post(f'{ALPACA_BASE_URL}/v2/orders', headers=headers, json=data)
+
+#     # Return response from API
+#     return jsonify(response.json()), response.status_code
