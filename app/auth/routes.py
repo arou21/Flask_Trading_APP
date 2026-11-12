@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, redirect, url_for, jsonify
 from models import User
 from .forms import UserCreationForm, LoginForm
@@ -9,7 +10,7 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import GetAssetsRequest
 import alpaca_trade_api as tradeapi
 
-trading_client = TradingClient('PKBL4DREIY800L0SL7J4', 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw')
+trading_client = TradingClient(os.environ.get('ALPACA_API_KEY'), os.environ.get('ALPACA_SECRET_KEY'))
 
 # Get our account information.
 account = trading_client.get_account()
@@ -187,8 +188,8 @@ def verifyToken(token):
 # app = Flask(__name__)
 
 # # Configure Alpaca API credentials
-# API_KEY = "<PKBL4DREIY800L0SL7J4>"
-# API_SECRET = "<Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw>"
+# API_KEY = "<YOUR_API_KEY>"
+# API_SECRET = "<YOUR_API_SECRET>"
 # BASE_URL = "https://paper-api.alpaca.markets"
 # alpaca = api.REST(API_KEY, API_SECRET, BASE_URL)
 

@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__name__))
 
 class Config():
@@ -8,8 +11,8 @@ class Config():
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    API_KEY = "<Your API Key>"
-    API_SECRET = "<Your Secret Key>"
+    API_KEY = os.environ.get('ALPACA_API_KEY')
+    API_SECRET = os.environ.get('ALPACA_SECRET_KEY')
     
 
                

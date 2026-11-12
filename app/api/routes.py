@@ -86,7 +86,7 @@ for position in portfolio:
 
 # @trade.route('/api/polygon/<ticker>/<date>')
 # def get_polygon_data(ticker, date):
-#     api_key = "RrDmtncR5mw_qpwqwSJJrzJHycXc0XoT"
+#     api_key = "YOUR_POLYGON_API_KEY"
 #     endpoint = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/day/{date}/{date}"
 #     params = {
 #         "apiKey": api_key
@@ -103,7 +103,7 @@ for position in portfolio:
 # @trade.route('/chartdata', methods=["GET"])
 # def chartdata():
     
-#     url = "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-01-09?apiKey=RrDmtncR5mw_qpwqwSJJrzJHycXc0XoT"
+#     url = "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-01-09?apiKey=YOUR_POLYGON_API_KEY"
 
 #     url = "https://bb-finance.p.rapidapi.com/market/get-chart"
 

@@ -1,9 +1,10 @@
+import os
 import requests
 
 url = 'https://{apiserver_domain}/v2/account'
 headers = {
-    'APCA-API-KEY-ID': '{PKBL4DREIY800L0SL7J4}',
-    'APCA-API-SECRET-KEY': '{Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw}'
+    'APCA-API-KEY-ID': os.environ.get('ALPACA_API_KEY'),
+    'APCA-API-SECRET-KEY': os.environ.get('ALPACA_SECRET_KEY')
 }
 
 response = requests.get(url, headers=headers)
@@ -19,8 +20,8 @@ print(response.content)
 def get_news_data(api_key_id, api_secret_key):
     url = 'https://data.alpaca.markets/v1beta1/news'
     headers = {
-        'Apca-Api-Key-Id': 'PKBL4DREIY800L0SL7J4',
-        'Apca-Api-Secret-Key': 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw',
+        'Apca-Api-Key-Id': os.environ.get('ALPACA_API_KEY'),
+        'Apca-Api-Secret-Key': os.environ.get('ALPACA_SECRET_KEY'),
     }
 
     response = requests.get(url, headers=headers)
@@ -39,7 +40,7 @@ def get_news_data(api_key_id, api_secret_key):
 
 # @trade.route('/api/polygon/<ticker>/<date>')
 # def get_polygon_data(ticker, date):
-#     api_key = "RrDmtncR5mw_qpwqwSJJrzJHycXc0XoT"
+#     api_key = "YOUR_POLYGON_API_KEY"
 #     endpoint = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/day/{date}/{date}"
 #     params = {
 #         "apiKey": api_key
@@ -56,7 +57,7 @@ def get_news_data(api_key_id, api_secret_key):
 # @trade.route('/chartdata', methods=["GET"])
 # def chartdata():
     
-#     url = "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-01-09?apiKey=RrDmtncR5mw_qpwqwSJJrzJHycXc0XoT"
+#     url = "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-01-09?apiKey=YOUR_POLYGON_API_KEY"
 
 #     url = "https://bb-finance.p.rapidapi.com/market/get-chart"
 

@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, redirect, url_for, jsonify
 from models import User,Transaction,Order,Trade,Position
 # from .forms import UserCreationForm, LoginForm
@@ -22,9 +23,9 @@ import datetime
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
 
-# stock_stream = StockDataStream("PKBL4DREIY800L0SL7J4", "secret-key")
+# stock_stream = StockDataStream("<YOUR_API_KEY>", "secret-key")
 
-trading_client = TradingClient('PKBL4DREIY800L0SL7J4', 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw', paper=True)
+trading_client = TradingClient(os.environ.get('ALPACA_API_KEY'), os.environ.get('ALPACA_SECRET_KEY'), paper=True)
 
 # Get our account information.
 account = trading_client.get_account()
@@ -46,8 +47,8 @@ auth = Blueprint('auth', __name__, template_folder='auth_templates')
 def get_news():
     url = 'https://data.alpaca.markets/v1beta1/news?exclude_contentless=true'
     headers = {
-        'Apca-Api-Key-Id': 'PKBL4DREIY800L0SL7J4',
-        'Apca-Api-Secret-Key': 'Oec9vb0djgaxLfiYYksnzG3GNjMJOjIyQgvZ4ASw',
+        'Apca-Api-Key-Id': os.environ.get('ALPACA_API_KEY'),
+        'Apca-Api-Secret-Key': os.environ.get('ALPACA_SECRET_KEY'),
     }
 
     response = requests.get(url, headers=headers)
